@@ -8,8 +8,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome per le icone -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- FontAwesome per le icone (Aggiornato con CDN ultra stabile) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -18,8 +18,31 @@
     <!-- Babel per leggere JSX nel browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- FIREBASE LIBRARIES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCB5yV6u4DtzUFb0jADUJobh8In52JNzp4",
+            authDomain: "maxcar-7416d.firebaseapp.com",
+            projectId: "maxcar-7416d",
+            storageBucket: "maxcar-7416d.firebasestorage.app",
+            messagingSenderId: "279232212865",
+            appId: "1:279232212865:web:3dd2eea57cb406e5bb4280",
+            measurementId: "G-N0T2XRWND0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Esponiamo Firebase globalmente in modo sicuro
+        window.firebaseDB = db;
+        window.firebaseCollection = collection;
+        window.firebaseGetDocs = getDocs;
+    </script>
+
     <style>
-        /* Regole base per nascondere il codice finché React non lo renderizza */
         body { margin: 0; padding: 0; background-color: #ffffff; }
         #root { min-height: 100vh; }
     </style>
@@ -28,7 +51,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         const CONFIG = {
             linkGoogleFormValutazione: "https://docs.google.com/forms/d/e/1FAIpQLSeYtcqgrOejvWqClIlEUneC2LPtTNzf67413H_mxFtcnGdnbw/viewform?embedded=true"
@@ -40,6 +63,8 @@
           const [selectedCar, setSelectedCar] = useState(null);
           const [activeImageIndex, setActiveImageIndex] = useState(0);
           const [inventoryFilter, setInventoryFilter] = useState('Tutti');
+          const [carsData, setCarsData] = useState([]);
+          const [isLoading, setIsLoading] = useState(true);
 
           const menuItems = [
             { label: 'Home', id: 'Home' },
@@ -49,100 +74,39 @@
             { label: 'Chi Siamo', id: 'chi-siamo' },
           ];
 
-          const carsData = [
-            {
-              id: 1,
-              category: 'Usato',
-              brand: "Audi",
-              model: "A6 Avant 40 TDI S-line",
-              name: "SILVER AUDI",
-              description: "Un'icona di eleganza e prestazioni, perfetta per chi cerca comfort e stile in ogni viaggio. Vettura in condizioni eccellenti con tagliandi certificati.",
-              images: [
-                "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200"
-              ],
-              year: "2019",
-              transmission: "Automatico",
-              mileage: "45.000 km",
-              fuel: "Diesel",
-              power: "204 CV",
-              displacement: "1.968 cm³",
-              color: "Grigio Daytona",
-              price: "€ 38.500"
-            },
-            {
-              id: 2,
-              category: 'Noleggio',
-              brand: "Jaguar",
-              model: "F-Type R-Dynamic",
-              name: "BLACK JAGUAR",
-              description: "Disponibile per noleggio a lungo termine. Potenza pura e design senza tempo. Una vettura che non passa mai inosservata su strada.",
-              images: [
-                "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200"
-              ],
-              year: "2018",
-              transmission: "Automatico",
-              mileage: "-",
-              fuel: "Benzina",
-              power: "300 CV",
-              displacement: "1.997 cm³",
-              color: "Nero Ossidiana",
-              price: "€ 850 / mese"
-            },
-            {
-              id: 3,
-              category: 'Usato',
-              brand: "BMW",
-              model: "M3 Competition G80",
-              name: "BLUE BMW",
-              description: "Dinamismo e tecnologia all'avanguardia. L'auto ideale per il piacere di guida assoluto con assetto adattivo M e prestazioni da supercar.",
-              images: [
-                "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1617814076367-b759c7d6273c?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
-                "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
-              ],
-              year: "2021",
-              transmission: "Automatico",
-              mileage: "15.000 km",
-              fuel: "Benzina",
-              power: "510 CV",
-              displacement: "2.993 cm³",
-              color: "Blu Portimao",
-              price: "€ 85.000"
-            },
-            {
-                id: 4,
-                category: 'Noleggio',
-                brand: "Mercedes-Benz",
-                model: "Classe A 200d AMG Line",
-                name: "WHITE MERCEDES",
-                description: "Compatta, elegante e tecnologicamente avanzata. Ideale per noleggio flessibile aziendale o privato.",
-                images: [
-                  "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?auto=format&fit=crop&q=80&w=1200",
-                  "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&q=80&w=1200",
-                  "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-                  "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
-                  "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
-                ],
-                year: "2023",
-                transmission: "Automatico",
-                mileage: "-",
-                fuel: "Diesel",
-                power: "150 CV",
-                displacement: "1.950 cm³",
-                color: "Bianco Polare",
-                price: "€ 550 / mese"
-              }
-          ];
+          useEffect(() => {
+            const fetchCars = () => {
+                // Intervallo per aspettare che Firebase si inizializzi
+                let checkDBInterval = setInterval(async () => {
+                    if (window.firebaseDB && window.firebaseCollection && window.firebaseGetDocs) {
+                        clearInterval(checkDBInterval);
+                        try {
+                            const carsCol = window.firebaseCollection(window.firebaseDB, 'cars'); 
+                            const snapshot = await window.firebaseGetDocs(carsCol);
+                            
+                            const fetchedCars = [];
+                            snapshot.forEach((doc) => {
+                                fetchedCars.push({ id: doc.id, ...doc.data() });
+                            });
+                            
+                            setCarsData(fetchedCars);
+                            setIsLoading(false); // Sblocca la pagina
+                        } catch (error) {
+                            console.error("Errore lettura database:", error);
+                            setIsLoading(false); // Sblocca la pagina anche se c'è un errore!
+                        }
+                    }
+                }, 200);
+
+                // Timeout di sicurezza: se dopo 4 secondi c'è un problema, sblocca forzatamente il sito
+                setTimeout(() => {
+                    clearInterval(checkDBInterval);
+                    setIsLoading(false);
+                }, 4000);
+            };
+
+            fetchCars();
+          }, []);
 
           const navigate = (page, car = null) => {
             setCurrentPage(page);
@@ -163,7 +127,7 @@
           return (
             <div className="min-h-screen bg-white font-sans text-slate-800 antialiased flex flex-col">
               
-              {}
+              {/* HEADER DESKTOP */}
               <header className="hidden lg:block relative w-full h-[140px] bg-white z-50 shadow-sm">
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
                   <div className="absolute top-0 left-0 w-[42%] h-[90px] bg-[#222d32]" style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)' }}></div>
@@ -210,16 +174,11 @@
                          </a>
                        ))}
                      </nav>
-                     <div className="flex gap-6 text-[18px]">
-                       <i className="fa-brands fa-facebook-f cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
-                       <i className="fa-brands fa-instagram cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
-                       <i className="fa-brands fa-linkedin-in cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
-                     </div>
                   </div>
                 </div>
               </header>
 
-              {}
+              {/* HEADER MOBILE */}
               <header className="lg:hidden bg-[#222d32] text-white p-5 flex justify-between items-center sticky top-0 z-50">
                 <div className="flex items-center cursor-pointer" onClick={() => navigate('Home')}>
                     <i className="fa-solid fa-car text-[30px] mr-2 text-[#ebbf40]"></i>
@@ -233,6 +192,7 @@
                 </button>
               </header>
 
+              {/* MENU MOBILE OVERLAY */}
               {isMobileMenuOpen && (
                 <div className="lg:hidden fixed inset-0 z-40 bg-[#222d32] pt-24 px-8 text-white flex flex-col gap-6 overflow-y-auto">
                     {menuItems.map(item => (
@@ -242,8 +202,15 @@
               )}
 
               <main className="flex-grow">
-                  {}
-                  {currentPage === 'Home' && (
+                  {/* SCHERMATA DI CARICAMENTO */}
+                  {isLoading && currentPage !== 'vendi' && currentPage !== 'chi-siamo' && currentPage !== 'Contatti' && (
+                      <div className="flex justify-center items-center py-40">
+                          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#ebbf40]"></div>
+                      </div>
+                  )}
+
+                  {/* VISTA HOME PAGE */}
+                  {currentPage === 'Home' && !isLoading && (
                       <>
                           <section className="relative h-[650px] flex items-center justify-center text-center overflow-hidden">
                             <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1920")' }}>
@@ -281,8 +248,8 @@
                       </>
                   )}
 
-                  {}
-                  {currentPage === 'Inventario' && (
+                  {/* VISTA INVENTARIO */}
+                  {currentPage === 'Inventario' && !isLoading && (
                       <section className="py-24 bg-gray-50">
                           <div className="max-w-[1200px] mx-auto px-6">
                             <div className="text-center mb-10">
@@ -315,7 +282,8 @@
                                         </span>
                                     </div>
                                     <div className="relative h-60 overflow-hidden">
-                                      <img src={car.images[0]} alt={car.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                      {/* Utilizza placeholder se l'immagine non è presente */}
+                                      <img src={car.images && car.images[0] ? car.images[0] : "https://placehold.co/600x400/eeeeee/999999?text=Nessuna+Foto"} alt={car.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                       <div className="absolute top-4 right-4 bg-[#ebbf40] text-[#222d32] px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest">{car.price}</div>
                                     </div>
                                     <div className="p-8">
@@ -330,8 +298,9 @@
                                   </div>
                                 ))}
                                 {filteredCars.length === 0 && (
-                                    <div className="col-span-full text-center py-20 text-gray-400">
-                                        Nessun veicolo trovato per questa categoria.
+                                    <div className="col-span-full text-center py-20">
+                                        <i className="fa-solid fa-car-side text-6xl text-gray-200 mb-4 block"></i>
+                                        <span className="text-gray-400 font-bold uppercase tracking-widest">Nessun veicolo presente nel database.</span>
                                     </div>
                                 )}
                             </div>
@@ -339,8 +308,8 @@
                       </section>
                   )}
 
-                  {}
-                  {currentPage === 'Dettaglio' && selectedCar && (
+                  {/* VISTA DETTAGLIO */}
+                  {currentPage === 'Dettaglio' && selectedCar && !isLoading && (
                       <section className="bg-white py-12">
                           <div className="max-w-[1200px] mx-auto px-6">
                               <button onClick={() => navigate('Inventario')} className="flex items-center gap-2 text-gray-400 hover:text-[#ebbf40] text-xs font-black uppercase tracking-widest mb-8 transition-colors w-max">
@@ -357,28 +326,30 @@
                                                       {selectedCar.category}
                                                   </span>
                                               </div>
-                                              <img src={selectedCar.images[activeImageIndex]} alt={selectedCar.model} className="w-full h-full object-cover transition-opacity duration-300" />
+                                              <img src={selectedCar.images && selectedCar.images[activeImageIndex] ? selectedCar.images[activeImageIndex] : "https://placehold.co/800x600/eeeeee/999999?text=Nessuna+Foto"} alt={selectedCar.model} className="w-full h-full object-cover transition-opacity duration-300" />
                                               <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                                                  {activeImageIndex + 1} / {selectedCar.images.length}
+                                                  {activeImageIndex + 1} / {selectedCar.images ? selectedCar.images.length : 1}
                                               </div>
                                           </div>
-                                          <div className="grid grid-cols-5 gap-3">
-                                              {selectedCar.images.map((img, idx) => (
-                                                  <div 
-                                                    key={idx} 
-                                                    onClick={() => setActiveImageIndex(idx)}
-                                                    className={`aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === idx ? 'border-[#ebbf40] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                                                  >
-                                                      <img src={img} className="w-full h-full object-cover" alt={`Miniatura ${idx + 1}`} />
-                                                  </div>
-                                              ))}
-                                          </div>
+                                          {selectedCar.images && selectedCar.images.length > 1 && (
+                                              <div className="grid grid-cols-5 gap-3">
+                                                  {selectedCar.images.map((img, idx) => (
+                                                      <div 
+                                                        key={idx} 
+                                                        onClick={() => setActiveImageIndex(idx)}
+                                                        className={`aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === idx ? 'border-[#ebbf40] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                                      >
+                                                          <img src={img} className="w-full h-full object-cover" alt={`Miniatura ${idx + 1}`} />
+                                                      </div>
+                                                  ))}
+                                              </div>
+                                          )}
                                       </div>
 
                                       <div className="flex flex-col justify-center">
                                           <span className="text-[#ebbf40] font-black uppercase tracking-[0.3em] text-xs mb-2">{selectedCar.brand}</span>
                                           <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-6 leading-tight">{selectedCar.model}</h1>
-                                          <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic">"{selectedCar.description}"</p>
+                                          <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic">"{selectedCar.description || 'Nessuna descrizione fornita.'}"</p>
                                           
                                           <div className="text-4xl lg:text-5xl font-black text-[#222d32] tracking-tighter mb-10 pb-8 border-b border-gray-100">
                                               {selectedCar.price}
@@ -412,16 +383,16 @@
 
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
                                           {[
-                                              { label: "Categoria", value: selectedCar.category },
-                                              { label: "Marca", value: selectedCar.brand },
-                                              { label: "Modello", value: selectedCar.model },
-                                              { label: "Anno", value: selectedCar.year },
-                                              { label: "Chilometri", value: selectedCar.mileage },
-                                              { label: "Alimentazione", value: selectedCar.fuel },
-                                              { label: "Cambio", value: selectedCar.transmission },
-                                              { label: "Potenza", value: selectedCar.power },
-                                              { label: "Cilindrata", value: selectedCar.displacement },
-                                              { label: "Colore", value: selectedCar.color }
+                                              { label: "Categoria", value: selectedCar.category || '-' },
+                                              { label: "Marca", value: selectedCar.brand || '-' },
+                                              { label: "Modello", value: selectedCar.model || '-' },
+                                              { label: "Anno", value: selectedCar.year || '-' },
+                                              { label: "Chilometri", value: selectedCar.mileage || '-' },
+                                              { label: "Alimentazione", value: selectedCar.fuel || '-' },
+                                              { label: "Cambio", value: selectedCar.transmission || '-' },
+                                              { label: "Potenza", value: selectedCar.power || '-' },
+                                              { label: "Cilindrata", value: selectedCar.displacement || '-' },
+                                              { label: "Colore", value: selectedCar.color || '-' }
                                           ].map((spec, i) => (
                                               <div key={i} className="flex justify-between items-center py-4 border-b border-gray-200">
                                                   <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">{spec.label}</span>
@@ -435,7 +406,7 @@
                       </section>
                   )}
 
-                  {}
+                  {/* VISTA VENDI */}
                   {currentPage === 'vendi' && (
                       <div className="py-24 px-6 max-w-5xl mx-auto animate-in fade-in duration-700">
                           <h2 className="text-5xl font-black uppercase italic mb-8 text-center">Vendi la tua <span className="text-red-600">Auto</span></h2>
@@ -454,7 +425,7 @@
                       </div>
                   )}
 
-                  {}
+                  {/* VISTA CHI SIAMO */}
                   {currentPage === 'chi-siamo' && (
                       <section className="bg-white animate-in fade-in duration-700">
                           <div className="bg-[#1a2226] py-24 px-6 text-center relative overflow-hidden">
@@ -506,7 +477,7 @@
                       </section>
                   )}
 
-                  {}
+                  {/* VISTA CONTATTI */}
                   {['Contatti'].includes(currentPage) && (
                       <section className="bg-white py-24 animate-in fade-in duration-700">
                           <div className="max-w-[1200px] mx-auto px-6">
@@ -598,10 +569,10 @@
                   )}
               </main>
 
-              {}
+              {/* FOOTER A 3 COLONNE SENZA SOCIAL */}
               <footer className="bg-[#1a2226] text-white pt-20 pb-10 mt-auto">
                 <div className="max-w-[1400px] mx-auto px-10">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16 border-b border-white/5 pb-16">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16 border-b border-white/5 pb-16">
                     <div className="col-span-1 md:col-span-1">
                       <div className="flex items-center mb-6 cursor-pointer" onClick={() => navigate('Home')}>
                           <i className="fa-solid fa-car text-[32px] mr-3 text-[#ebbf40]"></i>
@@ -620,14 +591,6 @@
                             <li key={item.label} onClick={() => navigate(item.id)} className="hover:text-white cursor-pointer uppercase tracking-widest transition-colors">{item.label}</li>
                         ))}
                       </ul>
-                    </div>
-                    <div>
-                        <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Social</h4>
-                        <div className="flex gap-4">
-                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-facebook-f text-[18px]"></i></div>
-                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-instagram text-[18px]"></i></div>
-                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-linkedin-in text-[18px]"></i></div>
-                        </div>
                     </div>
                     <div>
                       <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Contatti</h4>
