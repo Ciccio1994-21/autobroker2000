@@ -1,577 +1,650 @@
-import React, { useState } from 'react';
-import { 
-  Car, 
-  Phone, 
-  Users, 
-  Clock, 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  Linkedin,
-  X,
-  Sparkles,
-  Loader2,
-  Menu,
-  Search,
-  Mail,
-  MapPin,
-  ChevronRight,
-  ChevronLeft,
-  Calendar,
-  Settings,
-  Activity,
-  Droplet,
-  Zap,
-  Gauge,
-  CheckCircle,
-  Filter
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autobroker2000 Di Filippo Salvo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel per leggere JSX nel browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-const CONFIG = {
-    linkGoogleFormValutazione: "https://docs.google.com/forms/d/e/1FAIpQLSeYtcqgrOejvWqClIlEUneC2LPtTNzf67413H_mxFtcnGdnbw/viewform?embedded=true"
-};
+    <style>
+        /* Regole base per nascondere il codice finché React non lo renderizza */
+        body { margin: 0; padding: 0; background-color: #ffffff; }
+        #root { min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-export default function App() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const [currentPage, setCurrentPage] = useState('Home');
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  // Nuovo stato per filtrare l'inventario
-  const [inventoryFilter, setInventoryFilter] = useState('Tutti');
+    <script type="text/babel">
+        const { useState } = React;
 
-  const menuItems = [
-    { label: 'Home', id: 'Home' },
-    { label: 'Inventario', id: 'Inventario' },
-    { label: 'Vuoi vendere la tua auto', id: 'vendi' },
-    { label: 'Contatti', id: 'Contatti' },
-    { label: 'Chi Siamo', id: 'chi-siamo' },
-  ];
+        const CONFIG = {
+            linkGoogleFormValutazione: "https://docs.google.com/forms/d/e/1FAIpQLSeYtcqgrOejvWqClIlEUneC2LPtTNzf67413H_mxFtcnGdnbw/viewform?embedded=true"
+        };
 
-  const carsData = [
-    {
-      id: 1,
-      category: 'Usato', // Categoria per il filtro
-      brand: "Audi",
-      model: "A6 Avant 40 TDI S-line",
-      name: "SILVER AUDI",
-      description: "Un'icona di eleganza e prestazioni, perfetta per chi cerca comfort e stile in ogni viaggio. Vettura in condizioni eccellenti con tagliandi certificati.",
-      images: [
-        "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200"
-      ],
-      year: "2019",
-      transmission: "Automatico",
-      mileage: "45.000 km",
-      fuel: "Diesel",
-      power: "204 CV",
-      displacement: "1.968 cm³",
-      color: "Grigio Daytona",
-      price: "€ 38.500"
-    },
-    {
-      id: 2,
-      category: 'Noleggio', // Categoria per il filtro
-      brand: "Jaguar",
-      model: "F-Type R-Dynamic",
-      name: "BLACK JAGUAR",
-      description: "Disponibile per noleggio a lungo termine. Potenza pura e design senza tempo. Una vettura che non passa mai inosservata su strada.",
-      images: [
-        "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200"
-      ],
-      year: "2018",
-      transmission: "Automatico",
-      mileage: "-",
-      fuel: "Benzina",
-      power: "300 CV",
-      displacement: "1.997 cm³",
-      color: "Nero Ossidiana",
-      price: "€ 850 / mese"
-    },
-    {
-      id: 3,
-      category: 'Usato', // Categoria per il filtro
-      brand: "BMW",
-      model: "M3 Competition G80",
-      name: "BLUE BMW",
-      description: "Dinamismo e tecnologia all'avanguardia. L'auto ideale per il piacere di guida assoluto con assetto adattivo M e prestazioni da supercar.",
-      images: [
-        "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1617814076367-b759c7d6273c?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
-        "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
-      ],
-      year: "2021",
-      transmission: "Automatico",
-      mileage: "15.000 km",
-      fuel: "Benzina",
-      power: "510 CV",
-      displacement: "2.993 cm³",
-      color: "Blu Portimao",
-      price: "€ 85.000"
-    },
-    {
-        id: 4,
-        category: 'Noleggio', // Categoria per il filtro
-        brand: "Mercedes-Benz",
-        model: "Classe A 200d AMG Line",
-        name: "WHITE MERCEDES",
-        description: "Compatta, elegante e tecnologicamente avanzata. Ideale per noleggio flessibile aziendale o privato.",
-        images: [
-          "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
-        ],
-        year: "2023",
-        transmission: "Automatico",
-        mileage: "-",
-        fuel: "Diesel",
-        power: "150 CV",
-        displacement: "1.950 cm³",
-        color: "Bianco Polare",
-        price: "€ 550 / mese"
-      }
-  ];
+        function App() {
+          const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+          const [currentPage, setCurrentPage] = useState('Home');
+          const [selectedCar, setSelectedCar] = useState(null);
+          const [activeImageIndex, setActiveImageIndex] = useState(0);
+          const [inventoryFilter, setInventoryFilter] = useState('Tutti');
 
-  const navigate = (page, car = null) => {
-    setCurrentPage(page);
-    setSelectedCar(car);
-    setActiveImageIndex(0);
-    setIsMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+          const menuItems = [
+            { label: 'Home', id: 'Home' },
+            { label: 'Inventario', id: 'Inventario' },
+            { label: 'Vuoi vendere la tua auto', id: 'vendi' },
+            { label: 'Contatti', id: 'Contatti' },
+            { label: 'Chi Siamo', id: 'chi-siamo' },
+          ];
 
-  const filteredCars = inventoryFilter === 'Tutti' 
-    ? carsData 
-    : carsData.filter(car => car.category === inventoryFilter);
+          const carsData = [
+            {
+              id: 1,
+              category: 'Usato',
+              brand: "Audi",
+              model: "A6 Avant 40 TDI S-line",
+              name: "SILVER AUDI",
+              description: "Un'icona di eleganza e prestazioni, perfetta per chi cerca comfort e stile in ogni viaggio. Vettura in condizioni eccellenti con tagliandi certificati.",
+              images: [
+                "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200"
+              ],
+              year: "2019",
+              transmission: "Automatico",
+              mileage: "45.000 km",
+              fuel: "Diesel",
+              power: "204 CV",
+              displacement: "1.968 cm³",
+              color: "Grigio Daytona",
+              price: "€ 38.500"
+            },
+            {
+              id: 2,
+              category: 'Noleggio',
+              brand: "Jaguar",
+              model: "F-Type R-Dynamic",
+              name: "BLACK JAGUAR",
+              description: "Disponibile per noleggio a lungo termine. Potenza pura e design senza tempo. Una vettura che non passa mai inosservata su strada.",
+              images: [
+                "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200"
+              ],
+              year: "2018",
+              transmission: "Automatico",
+              mileage: "-",
+              fuel: "Benzina",
+              power: "300 CV",
+              displacement: "1.997 cm³",
+              color: "Nero Ossidiana",
+              price: "€ 850 / mese"
+            },
+            {
+              id: 3,
+              category: 'Usato',
+              brand: "BMW",
+              model: "M3 Competition G80",
+              name: "BLUE BMW",
+              description: "Dinamismo e tecnologia all'avanguardia. L'auto ideale per il piacere di guida assoluto con assetto adattivo M e prestazioni da supercar.",
+              images: [
+                "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1617814076367-b759c7d6273c?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
+                "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
+              ],
+              year: "2021",
+              transmission: "Automatico",
+              mileage: "15.000 km",
+              fuel: "Benzina",
+              power: "510 CV",
+              displacement: "2.993 cm³",
+              color: "Blu Portimao",
+              price: "€ 85.000"
+            },
+            {
+                id: 4,
+                category: 'Noleggio',
+                brand: "Mercedes-Benz",
+                model: "Classe A 200d AMG Line",
+                name: "WHITE MERCEDES",
+                description: "Compatta, elegante e tecnologicamente avanzata. Ideale per noleggio flessibile aziendale o privato.",
+                images: [
+                  "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?auto=format&fit=crop&q=80&w=1200",
+                  "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&q=80&w=1200",
+                  "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
+                  "https://images.unsplash.com/photo-1556182330-ad254462e70f?auto=format&fit=crop&q=80&w=1200",
+                  "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200"
+                ],
+                year: "2023",
+                transmission: "Automatico",
+                mileage: "-",
+                fuel: "Diesel",
+                power: "150 CV",
+                displacement: "1.950 cm³",
+                color: "Bianco Polare",
+                price: "€ 550 / mese"
+              }
+          ];
 
-  const whatsappMessage = selectedCar 
-    ? encodeURIComponent(`Salve, vorrei avere maggiori informazioni sulla ${selectedCar.brand} ${selectedCar.model} (${selectedCar.category}) vista sul sito.`) 
-    : '';
+          const navigate = (page, car = null) => {
+            setCurrentPage(page);
+            setSelectedCar(car);
+            setActiveImageIndex(0);
+            setIsMobileMenuOpen(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
 
-  return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 antialiased flex flex-col">
-      
-      {}
-      <header className="hidden lg:block relative w-full h-[140px] bg-white z-50 shadow-sm">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-0 w-[42%] h-[90px] bg-[#222d32]" style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)' }}></div>
-          <div className="absolute bottom-0 left-0 w-full h-[50px] bg-[#222d32]" style={{ clipPath: 'polygon(7% 0, 100% 0, 100% 100%, 0 100%)' }}></div>
-        </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto h-full flex flex-col">
-          <div className="flex h-[90px]">
-            <div className="w-[35%] flex items-center pl-10 text-white cursor-pointer" onClick={() => navigate('Home')}>
-              <Car size={40} className="mr-3 text-[#ebbf40]" />
-              <div className="flex flex-col leading-tight">
-                <span className="text-2xl font-black tracking-tighter uppercase">Autobroker2000</span>
-                <span className="text-[10px] tracking-[0.3em] uppercase text-[#ebbf40] font-bold">Di Filippo Salvo</span>
-              </div>
-            </div>
-            <div className="w-[65%] flex items-center justify-end gap-10 pr-10">
-               <div className="flex items-center gap-3">
-                 <div className="bg-gray-100 p-2 rounded-full"><Phone size={16} className="text-[#222d32]" /></div>
-                 <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Chiamaci:</span><span className="text-[13px] font-bold text-gray-800">+39 393 975 1296</span></div>
-               </div>
-               <div className="flex items-center gap-3">
-                 <div className="bg-gray-100 p-2 rounded-full"><Mail size={16} className="text-[#222d32]" /></div>
-                 <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Email:</span><span className="text-[13px] font-bold text-gray-800">Filipposalvo@hotmail.it</span></div>
-               </div>
-               <div className="flex items-center gap-3">
-                 <div className="bg-gray-100 p-2 rounded-full"><MapPin size={16} className="text-[#222d32]" /></div>
-                 <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Sede:</span><span className="text-[13px] font-bold text-gray-800">Roma (RM)</span></div>
-               </div>
-               <div className="flex items-center gap-3">
-                 <div className="bg-gray-100 p-2 rounded-full"><Clock size={16} className="text-[#222d32]" /></div>
-                 <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Orari:</span><span className="text-[13px] font-bold text-gray-800">9:00 - 19:30</span></div>
-               </div>
-            </div>
-          </div>
-          <div className="flex h-[50px] items-center justify-between text-white px-10">
-             <nav className="flex gap-8 pl-[10%] text-[13px] font-bold uppercase tracking-widest h-full items-center">
-               {menuItems.map((item) => (
-                 <a 
-                    key={item.label} 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); navigate(item.id); }}
-                    className={`transition-all duration-300 border-b-2 py-1 ${currentPage === item.id ? 'text-[#ebbf40] border-[#ebbf40]' : 'border-transparent hover:text-[#ebbf40]'}`}
-                 >
-                    {item.label}
-                 </a>
-               ))}
-             </nav>
-             <div className="flex gap-6">
-               <Facebook size={18} className="cursor-pointer hover:text-[#ebbf40] transition-colors" />
-               <Instagram size={18} className="cursor-pointer hover:text-[#ebbf40] transition-colors" />
-               <Linkedin size={18} className="cursor-pointer hover:text-[#ebbf40] transition-colors" />
-             </div>
-          </div>
-        </div>
-      </header>
+          const filteredCars = inventoryFilter === 'Tutti' 
+            ? carsData 
+            : carsData.filter(car => car.category === inventoryFilter);
 
-      {}
-      <header className="lg:hidden bg-[#222d32] text-white p-5 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center cursor-pointer" onClick={() => navigate('Home')}>
-            <Car size={30} className="mr-2 text-[#ebbf40]" />
-            <div className="flex flex-col">
-                <span className="text-xl font-black uppercase tracking-tighter leading-none">Autobroker2000</span>
-                <span className="text-[8px] uppercase tracking-widest text-[#ebbf40]">Di Filippo Salvo</span>
-            </div>
-        </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>{isMobileMenuOpen ? <X size={30} /> : <Menu size={30} />}</button>
-      </header>
+          const whatsappMessage = selectedCar 
+            ? encodeURIComponent(`Salve, vorrei avere maggiori informazioni sulla ${selectedCar.brand} ${selectedCar.model} (${selectedCar.category}) vista sul sito.`) 
+            : '';
 
-      {/* MENU MOBILE OVERLAY */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-[#222d32] pt-24 px-8 text-white flex flex-col gap-6 overflow-y-auto">
-            {menuItems.map(item => (
-                <a key={item.label} href="#" onClick={(e) => { e.preventDefault(); navigate(item.id); }} className={`text-2xl font-bold uppercase tracking-widest border-b border-white/10 pb-3 ${currentPage === item.id ? 'text-[#ebbf40]' : ''}`}>{item.label}</a>
-            ))}
-        </div>
-      )}
-
-      <main className="flex-grow">
-          {}
-          {currentPage === 'Home' && (
-              <>
-                  <section className="relative h-[650px] flex items-center justify-center text-center overflow-hidden">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1920")' }}>
-                      <div className="absolute inset-0 bg-black/65"></div>
-                    </div>
-                    <div className="relative z-10 px-6 max-w-4xl mx-auto">
-                      <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-wider leading-tight">ESPLORA L'AUTO DEI TUOI SOGNI</h2>
-                      <div className="flex items-center justify-center gap-5 my-10"><div className="h-px w-24 bg-white/30"></div><Car className="text-[#ebbf40]" size={30} /><div className="h-px w-24 bg-white/30"></div></div>
-                      <p className="text-white text-lg font-light mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">Auto usate garantite e servizio di noleggio gestiti con l'esperienza pluridecennale di Filippo Salvo.</p>
-                      <button onClick={() => navigate('Inventario')} className="bg-[#ebbf40] text-[#222d32] px-12 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white transition-all shadow-lg">SCOPRI IL PARCO AUTO</button>
-                    </div>
-                  </section>
-
-                  <section className="py-24 bg-gray-50">
-                    <div className="max-w-6xl mx-auto px-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-                        <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#ebbf40]">
-                          <div className="w-24 h-24 rounded-full bg-[#ebbf40] flex items-center justify-center mb-8"><Users className="text-[#222d32]" size={38} /></div>
-                          <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Esperienza e Passione</h3>
-                          <p className="text-gray-500 text-sm leading-relaxed">Dal 1985 nel settore automobilistico. Un broker esperto al tuo servizio.</p>
-                        </div>
-                        <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#222d32]">
-                          <div className="w-24 h-24 rounded-full bg-[#222d32] flex items-center justify-center mb-8"><Car className="text-white" size={38} /></div>
-                          <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Vendita & Noleggio</h3>
-                          <p className="text-gray-500 text-sm leading-relaxed">Offriamo sia usato garantito di qualità che opzioni di noleggio flessibili.</p>
-                        </div>
-                        <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#222d32]">
-                          <div className="w-24 h-24 rounded-full bg-[#222d32] flex items-center justify-center mb-8"><CheckCircle className="text-white" size={38} /></div>
-                          <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Testate da Esperti</h3>
-                          <p className="text-gray-500 text-sm leading-relaxed">Controlli meticolosi derivanti dall'esperienza come ex-collaudatore tecnico.</p>
-                        </div>
+          return (
+            <div className="min-h-screen bg-white font-sans text-slate-800 antialiased flex flex-col">
+              
+              {}
+              <header className="hidden lg:block relative w-full h-[140px] bg-white z-50 shadow-sm">
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <div className="absolute top-0 left-0 w-[42%] h-[90px] bg-[#222d32]" style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)' }}></div>
+                  <div className="absolute bottom-0 left-0 w-full h-[50px] bg-[#222d32]" style={{ clipPath: 'polygon(7% 0, 100% 0, 100% 100%, 0 100%)' }}></div>
+                </div>
+                <div className="relative z-10 max-w-[1440px] mx-auto h-full flex flex-col">
+                  <div className="flex h-[90px]">
+                    <div className="w-[35%] flex items-center pl-10 text-white cursor-pointer" onClick={() => navigate('Home')}>
+                      <i className="fa-solid fa-car text-[40px] mr-3 text-[#ebbf40]"></i>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-2xl font-black tracking-tighter uppercase">Autobroker2000</span>
+                        <span className="text-[10px] tracking-[0.3em] uppercase text-[#ebbf40] font-bold">Di Filippo Salvo</span>
                       </div>
                     </div>
-                  </section>
-              </>
-          )}
-
-          {}
-          {currentPage === 'Inventario' && (
-              <section className="py-24 bg-gray-50">
-                  <div className="max-w-[1200px] mx-auto px-6">
-                    <div className="text-center mb-10">
-                      <h1 className="text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-4">Il Nostro Parco Auto</h1>
-                      <div className="flex items-center justify-center gap-4 mb-8"><div className="h-[2px] w-12 bg-[#ebbf40]"></div><Car className="text-[#ebbf40]" size={20} /><div className="h-[2px] w-12 bg-[#ebbf40]"></div></div>
-                      
-                      {/* Filtri Usato / Noleggio */}
-                      <div className="flex flex-wrap justify-center gap-4 mb-12">
-                          {['Tutti', 'Usato', 'Noleggio'].map(filter => (
-                              <button 
-                                key={filter}
-                                onClick={() => setInventoryFilter(filter)}
-                                className={`px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition-all shadow-sm ${
-                                    inventoryFilter === filter 
-                                    ? 'bg-[#222d32] text-[#ebbf40] border-2 border-[#222d32]' 
-                                    : 'bg-white text-gray-500 border-2 border-gray-200 hover:border-[#ebbf40] hover:text-[#222d32]'
-                                }`}
-                              >
-                                  {filter === 'Tutti' ? 'Tutto il Parco' : (filter === 'Usato' ? 'In Vendita (Usato)' : 'A Noleggio')}
-                              </button>
-                          ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {filteredCars.map((car) => (
-                          <div key={car.id} onClick={() => navigate('Dettaglio', car)} className="bg-white rounded-2xl overflow-hidden shadow-lg group cursor-pointer transition-all duration-500 hover:-translate-y-2 border border-gray-100 relative">
-                            <div className="absolute top-4 left-4 z-10">
-                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md ${car.category === 'Usato' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                                    {car.category}
-                                </span>
-                            </div>
-                            <div className="relative h-60 overflow-hidden">
-                              <img src={car.images[0]} alt={car.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                              <div className="absolute top-4 right-4 bg-[#ebbf40] text-[#222d32] px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest">{car.price}</div>
-                            </div>
-                            <div className="p-8">
-                              <h3 className="text-xl font-black text-[#222d32] uppercase tracking-tighter mb-4">{car.brand} {car.model}</h3>
-                              <div className="flex justify-between text-sm text-gray-500 mb-6">
-                                  <span className="flex items-center gap-1"><Calendar size={14} /> {car.year}</span>
-                                  <span className="flex items-center gap-1"><Gauge size={14} /> {car.mileage}</span>
-                                  <span className="flex items-center gap-1"><Droplet size={14} /> {car.fuel}</span>
-                              </div>
-                              <button className="w-full bg-[#222d32] text-white py-3 rounded-xl uppercase text-[11px] font-black tracking-widest hover:bg-[#ebbf40] hover:text-[#222d32] transition-colors">Vedi Dettagli</button>
-                            </div>
-                          </div>
-                        ))}
-                        {filteredCars.length === 0 && (
-                            <div className="col-span-full text-center py-20 text-gray-400">
-                                Nessun veicolo trovato per questa categoria.
-                            </div>
-                        )}
+                    <div className="w-[65%] flex items-center justify-end gap-10 pr-10">
+                       <div className="flex items-center gap-3">
+                         <div className="bg-gray-100 p-2 rounded-full w-8 h-8 flex items-center justify-center"><i className="fa-solid fa-phone text-[#222d32]"></i></div>
+                         <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Chiamaci:</span><span className="text-[13px] font-bold text-gray-800">+39 393 975 1296</span></div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                         <div className="bg-gray-100 p-2 rounded-full w-8 h-8 flex items-center justify-center"><i className="fa-solid fa-envelope text-[#222d32]"></i></div>
+                         <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Email:</span><span className="text-[13px] font-bold text-gray-800">Filipposalvo@hotmail.it</span></div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                         <div className="bg-gray-100 p-2 rounded-full w-8 h-8 flex items-center justify-center"><i className="fa-solid fa-location-dot text-[#222d32]"></i></div>
+                         <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Sede:</span><span className="text-[13px] font-bold text-gray-800">Roma (RM)</span></div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                         <div className="bg-gray-100 p-2 rounded-full w-8 h-8 flex items-center justify-center"><i className="fa-regular fa-clock text-[#222d32]"></i></div>
+                         <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-400 uppercase">Orari:</span><span className="text-[13px] font-bold text-gray-800">9:00 - 19:30</span></div>
+                       </div>
                     </div>
                   </div>
-              </section>
-          )}
+                  <div className="flex h-[50px] items-center justify-between text-white px-10">
+                     <nav className="flex gap-8 pl-[10%] text-[13px] font-bold uppercase tracking-widest h-full items-center">
+                       {menuItems.map((item) => (
+                         <a 
+                            key={item.label} 
+                            href="#" 
+                            onClick={(e) => { e.preventDefault(); navigate(item.id); }}
+                            className={`transition-all duration-300 border-b-2 py-1 ${currentPage === item.id ? 'text-[#ebbf40] border-[#ebbf40]' : 'border-transparent hover:text-[#ebbf40]'}`}
+                         >
+                            {item.label}
+                         </a>
+                       ))}
+                     </nav>
+                     <div className="flex gap-6 text-[18px]">
+                       <i className="fa-brands fa-facebook-f cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
+                       <i className="fa-brands fa-instagram cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
+                       <i className="fa-brands fa-linkedin-in cursor-pointer hover:text-[#ebbf40] transition-colors"></i>
+                     </div>
+                  </div>
+                </div>
+              </header>
 
-          {}
-          {currentPage === 'Dettaglio' && selectedCar && (
-              <section className="bg-white py-12">
-                  <div className="max-w-[1200px] mx-auto px-6">
-                      <button onClick={() => navigate('Inventario')} className="flex items-center gap-2 text-gray-400 hover:text-[#ebbf40] text-xs font-black uppercase tracking-widest mb-8 transition-colors w-max">
-                          <ChevronLeft size={16} /> Torna all'inventario
-                      </button>
+              {}
+              <header className="lg:hidden bg-[#222d32] text-white p-5 flex justify-between items-center sticky top-0 z-50">
+                <div className="flex items-center cursor-pointer" onClick={() => navigate('Home')}>
+                    <i className="fa-solid fa-car text-[30px] mr-2 text-[#ebbf40]"></i>
+                    <div className="flex flex-col">
+                        <span className="text-xl font-black uppercase tracking-tighter leading-none">Autobroker2000</span>
+                        <span className="text-[8px] uppercase tracking-widest text-[#ebbf40]">Di Filippo Salvo</span>
+                    </div>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                  {isMobileMenuOpen ? <i className="fa-solid fa-xmark text-[30px]"></i> : <i className="fa-solid fa-bars text-[30px]"></i>}
+                </button>
+              </header>
 
-                      <div className="bg-white rounded-[3rem] shadow-2xl border border-gray-100 p-6 md:p-12">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+              {isMobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-40 bg-[#222d32] pt-24 px-8 text-white flex flex-col gap-6 overflow-y-auto">
+                    {menuItems.map(item => (
+                        <a key={item.label} href="#" onClick={(e) => { e.preventDefault(); navigate(item.id); }} className={`text-2xl font-bold uppercase tracking-widest border-b border-white/10 pb-3 ${currentPage === item.id ? 'text-[#ebbf40]' : ''}`}>{item.label}</a>
+                    ))}
+                </div>
+              )}
+
+              <main className="flex-grow">
+                  {}
+                  {currentPage === 'Home' && (
+                      <>
+                          <section className="relative h-[650px] flex items-center justify-center text-center overflow-hidden">
+                            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1920")' }}>
+                              <div className="absolute inset-0 bg-black/65"></div>
+                            </div>
+                            <div className="relative z-10 px-6 max-w-4xl mx-auto">
+                              <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-wider leading-tight">ESPLORA L'AUTO DEI TUOI SOGNI</h2>
+                              <div className="flex items-center justify-center gap-5 my-10"><div className="h-px w-24 bg-white/30"></div><i className="fa-solid fa-car text-[30px] text-[#ebbf40]"></i><div className="h-px w-24 bg-white/30"></div></div>
+                              <p className="text-white text-lg font-light mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">Auto usate garantite e servizio di noleggio gestiti con l'esperienza pluridecennale di Filippo Salvo.</p>
+                              <button onClick={() => navigate('Inventario')} className="bg-[#ebbf40] text-[#222d32] px-12 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white transition-all shadow-lg">SCOPRI IL PARCO AUTO</button>
+                            </div>
+                          </section>
+
+                          <section className="py-24 bg-gray-50">
+                            <div className="max-w-6xl mx-auto px-6">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                                <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#ebbf40]">
+                                  <div className="w-24 h-24 rounded-full bg-[#ebbf40] flex items-center justify-center mb-8"><i className="fa-solid fa-users text-[38px] text-[#222d32]"></i></div>
+                                  <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Esperienza e Passione</h3>
+                                  <p className="text-gray-500 text-sm leading-relaxed">Dal 1985 nel settore automobilistico. Un broker esperto al tuo servizio.</p>
+                                </div>
+                                <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#222d32]">
+                                  <div className="w-24 h-24 rounded-full bg-[#222d32] flex items-center justify-center mb-8"><i className="fa-solid fa-car text-[38px] text-white"></i></div>
+                                  <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Vendita & Noleggio</h3>
+                                  <p className="text-gray-500 text-sm leading-relaxed">Offriamo sia usato garantito di qualità che opzioni di noleggio flessibili.</p>
+                                </div>
+                                <div className="flex flex-col items-center group bg-white p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all border-b-4 border-transparent hover:border-[#222d32]">
+                                  <div className="w-24 h-24 rounded-full bg-[#222d32] flex items-center justify-center mb-8"><i className="fa-solid fa-circle-check text-[38px] text-white"></i></div>
+                                  <h3 className="text-xl font-black text-[#222d32] mb-5 uppercase tracking-tighter">Testate da Esperti</h3>
+                                  <p className="text-gray-500 text-sm leading-relaxed">Controlli meticolosi derivanti dall'esperienza come ex-collaudatore tecnico.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </section>
+                      </>
+                  )}
+
+                  {}
+                  {currentPage === 'Inventario' && (
+                      <section className="py-24 bg-gray-50">
+                          <div className="max-w-[1200px] mx-auto px-6">
+                            <div className="text-center mb-10">
+                              <h1 className="text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-4">Il Nostro Parco Auto</h1>
+                              <div className="flex items-center justify-center gap-4 mb-8"><div className="h-[2px] w-12 bg-[#ebbf40]"></div><i className="fa-solid fa-car text-[20px] text-[#ebbf40]"></i><div className="h-[2px] w-12 bg-[#ebbf40]"></div></div>
                               
-                              <div className="flex flex-col gap-4">
-                                  <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-lg border border-gray-100 relative">
-                                      <div className="absolute top-4 left-4 z-10">
-                                          <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-md ${selectedCar.category === 'Usato' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                                              {selectedCar.category}
-                                          </span>
-                                      </div>
-                                      <img src={selectedCar.images[activeImageIndex]} alt={selectedCar.model} className="w-full h-full object-cover transition-opacity duration-300" />
-                                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                                          {activeImageIndex + 1} / {selectedCar.images.length}
-                                      </div>
-                                  </div>
-                                  <div className="grid grid-cols-5 gap-3">
-                                      {selectedCar.images.map((img, idx) => (
-                                          <div 
-                                            key={idx} 
-                                            onClick={() => setActiveImageIndex(idx)}
-                                            className={`aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === idx ? 'border-[#ebbf40] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                                          >
-                                              <img src={img} className="w-full h-full object-cover" alt={`Miniatura ${idx + 1}`} />
-                                          </div>
-                                      ))}
-                                  </div>
-                              </div>
-
-                              <div className="flex flex-col justify-center">
-                                  <span className="text-[#ebbf40] font-black uppercase tracking-[0.3em] text-xs mb-2">{selectedCar.brand}</span>
-                                  <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-6 leading-tight">{selectedCar.model}</h1>
-                                  <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic">"{selectedCar.description}"</p>
-                                  
-                                  <div className="text-4xl lg:text-5xl font-black text-[#222d32] tracking-tighter mb-10 pb-8 border-b border-gray-100">
-                                      {selectedCar.price}
-                                  </div>
-
-                                  <div className="flex flex-col gap-4 mb-12">
-                                      <a 
-                                        href="tel:+393939751296" 
-                                        className="w-full bg-[#222d32] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#ebbf40] hover:text-[#222d32] transition-colors shadow-xl flex justify-center items-center gap-3"
+                              <div className="flex flex-wrap justify-center gap-4 mb-12">
+                                  {['Tutti', 'Usato', 'Noleggio'].map(filter => (
+                                      <button 
+                                        key={filter}
+                                        onClick={() => setInventoryFilter(filter)}
+                                        className={`px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs transition-all shadow-sm ${
+                                            inventoryFilter === filter 
+                                            ? 'bg-[#222d32] text-[#ebbf40] border-2 border-[#222d32]' 
+                                            : 'bg-white text-gray-500 border-2 border-gray-200 hover:border-[#ebbf40] hover:text-[#222d32]'
+                                        }`}
                                       >
-                                          <Phone size={18} /> {selectedCar.category === 'Noleggio' ? 'Chiama per Noleggiare' : 'Chiamaci ora per saperne di più'}
-                                      </a>
-                                      <a 
-                                        href={`https://api.whatsapp.com/send?phone=393939751296&text=${whatsappMessage}`} 
-                                        target="_blank" rel="noreferrer"
-                                        className="w-full bg-[#25D366] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:opacity-90 transition-opacity shadow-xl flex justify-center items-center gap-3"
-                                      >
-                                          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                          Scrivici su WhatsApp
-                                      </a>
-                                  </div>
-                              </div>
-                          </div>
-
-                          <div className="mt-16 bg-gray-50 rounded-[3rem] p-8 md:p-12 border border-gray-100">
-                              <div className="flex items-center gap-4 mb-10">
-                                  <div className="w-12 h-12 bg-[#222d32] rounded-2xl flex items-center justify-center text-[#ebbf40]">
-                                      <Settings size={24} />
-                                  </div>
-                                  <h2 className="text-3xl font-black uppercase text-[#222d32] tracking-tighter">Scheda Tecnica</h2>
-                              </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
-                                  {[
-                                      { label: "Categoria", value: selectedCar.category },
-                                      { label: "Marca", value: selectedCar.brand },
-                                      { label: "Modello", value: selectedCar.model },
-                                      { label: "Anno", value: selectedCar.year },
-                                      { label: "Chilometri", value: selectedCar.mileage },
-                                      { label: "Alimentazione", value: selectedCar.fuel },
-                                      { label: "Cambio", value: selectedCar.transmission },
-                                      { label: "Potenza", value: selectedCar.power },
-                                      { label: "Cilindrata", value: selectedCar.displacement },
-                                      { label: "Colore", value: selectedCar.color }
-                                  ].map((spec, i) => (
-                                      <div key={i} className="flex justify-between items-center py-4 border-b border-gray-200">
-                                          <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">{spec.label}</span>
-                                          <span className="text-[#222d32] font-black uppercase text-xs">{spec.value}</span>
-                                      </div>
+                                          {filter === 'Tutti' ? 'Tutto il Parco' : (filter === 'Usato' ? 'In Vendita (Usato)' : 'A Noleggio')}
+                                      </button>
                                   ))}
                               </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {filteredCars.map((car) => (
+                                  <div key={car.id} onClick={() => navigate('Dettaglio', car)} className="bg-white rounded-2xl overflow-hidden shadow-lg group cursor-pointer transition-all duration-500 hover:-translate-y-2 border border-gray-100 relative">
+                                    <div className="absolute top-4 left-4 z-10">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md ${car.category === 'Usato' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                                            {car.category}
+                                        </span>
+                                    </div>
+                                    <div className="relative h-60 overflow-hidden">
+                                      <img src={car.images[0]} alt={car.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                      <div className="absolute top-4 right-4 bg-[#ebbf40] text-[#222d32] px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest">{car.price}</div>
+                                    </div>
+                                    <div className="p-8">
+                                      <h3 className="text-xl font-black text-[#222d32] uppercase tracking-tighter mb-4">{car.brand} {car.model}</h3>
+                                      <div className="flex justify-between text-sm text-gray-500 mb-6">
+                                          <span className="flex items-center gap-2"><i className="fa-regular fa-calendar"></i> {car.year}</span>
+                                          <span className="flex items-center gap-2"><i className="fa-solid fa-gauge-high"></i> {car.mileage}</span>
+                                          <span className="flex items-center gap-2"><i className="fa-solid fa-droplet"></i> {car.fuel}</span>
+                                      </div>
+                                      <button className="w-full bg-[#222d32] text-white py-3 rounded-xl uppercase text-[11px] font-black tracking-widest hover:bg-[#ebbf40] hover:text-[#222d32] transition-colors">Vedi Dettagli</button>
+                                    </div>
+                                  </div>
+                                ))}
+                                {filteredCars.length === 0 && (
+                                    <div className="col-span-full text-center py-20 text-gray-400">
+                                        Nessun veicolo trovato per questa categoria.
+                                    </div>
+                                )}
+                            </div>
                           </div>
-                      </div>
-                  </div>
-              </section>
-          )}
+                      </section>
+                  )}
 
-          {}
-          {['Contatti'].includes(currentPage) && (
-              <section className="bg-white py-24 animate-in fade-in duration-700">
-                  <div className="max-w-[1200px] mx-auto px-6">
-                      <div className="text-center mb-16">
-                          <span className="text-[#ebbf40] font-black uppercase tracking-[0.2em] text-xs">Siamo a tua disposizione</span>
-                          <h1 className="text-5xl lg:text-6xl font-black uppercase tracking-tighter text-[#222d32] mt-2 mb-6">Contattaci</h1>
-                          <div className="flex items-center justify-center gap-4">
-                              <div className="h-[2px] w-12 bg-gray-200"></div>
-                              <Mail className="text-gray-300" size={20} />
-                              <div className="h-[2px] w-12 bg-gray-200"></div>
-                          </div>
-                      </div>
+                  {}
+                  {currentPage === 'Dettaglio' && selectedCar && (
+                      <section className="bg-white py-12">
+                          <div className="max-w-[1200px] mx-auto px-6">
+                              <button onClick={() => navigate('Inventario')} className="flex items-center gap-2 text-gray-400 hover:text-[#ebbf40] text-xs font-black uppercase tracking-widest mb-8 transition-colors w-max">
+                                  <i className="fa-solid fa-chevron-left text-[16px]"></i> Torna all'inventario
+                              </button>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-                          {/* Colonna Informazioni */}
-                          <div className="flex flex-col gap-8">
-                              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
-                                  <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
-                                      <MapPin size={28} />
-                                  </div>
-                                  <div>
-                                      <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">La Nostra Sede</h3>
-                                      <p className="text-gray-500 leading-relaxed font-medium">Via Alfredo Casella 13<br/>00199 Roma (RM)</p>
-                                  </div>
-                              </div>
-
-                              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
-                                  <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
-                                      <Phone size={28} />
-                                  </div>
-                                  <div>
-                                      <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">Recapito Telefonico</h3>
-                                      <p className="text-gray-500 leading-relaxed font-medium mb-3">Chiamaci per qualsiasi informazione, valutazione o per prenotare un appuntamento.</p>
-                                      <a href="tel:+393939751296" className="inline-flex text-[#222d32] font-black text-lg hover:text-[#ebbf40] transition-colors">
-                                          +39 393 975 1296
-                                      </a>
-                                  </div>
-                              </div>
-
-                              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
-                                  <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
-                                      <Mail size={28} />
-                                  </div>
-                                  <div>
-                                      <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">Posta Elettronica</h3>
-                                      <p className="text-gray-500 leading-relaxed font-medium mb-3">Preferisci scriverci? Inviaci un'email e ti risponderemo il prima possibile.</p>
-                                      <a href="mailto:Filipposalvo@hotmail.it" className="inline-flex text-[#222d32] font-black text-lg hover:text-[#ebbf40] transition-colors break-all">
-                                          Filipposalvo@hotmail.it
-                                      </a>
-                                  </div>
-                              </div>
-                          </div>
-
-                          {/* Colonna Mappa/Orari */}
-                          <div className="flex flex-col gap-8 h-full">
-                              <div className="bg-[#1a2226] text-white rounded-3xl p-10 shadow-xl h-full flex flex-col justify-center relative overflow-hidden">
-                                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#ebbf40]/10 rounded-full blur-2xl"></div>
-                                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#ebbf40]/10 rounded-full blur-2xl"></div>
-                                  
-                                  <div className="relative z-10">
-                                      <h3 className="text-3xl font-black uppercase text-[#ebbf40] tracking-tighter mb-8 flex items-center gap-3">
-                                          <Clock size={28} /> Orari di Apertura
-                                      </h3>
+                              <div className="bg-white rounded-[3rem] shadow-2xl border border-gray-100 p-6 md:p-12">
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
                                       
                                       <div className="flex flex-col gap-4">
-                                          <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                                              <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Lunedì - Venerdì</span>
-                                              <span className="text-white font-black">09:00 - 13:00 / 15:00 - 19:30</span>
+                                          <div className="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-lg border border-gray-100 relative">
+                                              <div className="absolute top-4 left-4 z-10">
+                                                  <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-md ${selectedCar.category === 'Usato' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                                                      {selectedCar.category}
+                                                  </span>
+                                              </div>
+                                              <img src={selectedCar.images[activeImageIndex]} alt={selectedCar.model} className="w-full h-full object-cover transition-opacity duration-300" />
+                                              <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                                  {activeImageIndex + 1} / {selectedCar.images.length}
+                                              </div>
                                           </div>
-                                          <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                                              <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Sabato</span>
-                                              <span className="text-white font-black">09:00 - 13:00</span>
-                                          </div>
-                                          <div className="flex justify-between items-center pb-4">
-                                              <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Domenica</span>
-                                              <span className="text-red-400 font-black">Chiuso</span>
+                                          <div className="grid grid-cols-5 gap-3">
+                                              {selectedCar.images.map((img, idx) => (
+                                                  <div 
+                                                    key={idx} 
+                                                    onClick={() => setActiveImageIndex(idx)}
+                                                    className={`aspect-square rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${activeImageIndex === idx ? 'border-[#ebbf40] scale-95 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                                  >
+                                                      <img src={img} className="w-full h-full object-cover" alt={`Miniatura ${idx + 1}`} />
+                                                  </div>
+                                              ))}
                                           </div>
                                       </div>
 
-                                      <div className="mt-10 p-6 bg-white/5 rounded-2xl border border-white/10">
-                                          <p className="text-gray-300 text-sm leading-relaxed italic">
-                                              "Si consiglia di fissare sempre un appuntamento telefonico prima di recarsi in sede per garantire la nostra totale disponibilità."
+                                      <div className="flex flex-col justify-center">
+                                          <span className="text-[#ebbf40] font-black uppercase tracking-[0.3em] text-xs mb-2">{selectedCar.brand}</span>
+                                          <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-6 leading-tight">{selectedCar.model}</h1>
+                                          <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic">"{selectedCar.description}"</p>
+                                          
+                                          <div className="text-4xl lg:text-5xl font-black text-[#222d32] tracking-tighter mb-10 pb-8 border-b border-gray-100">
+                                              {selectedCar.price}
+                                          </div>
+
+                                          <div className="flex flex-col gap-4 mb-12">
+                                              <a 
+                                                href="tel:+393939751296" 
+                                                className="w-full bg-[#222d32] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#ebbf40] hover:text-[#222d32] transition-colors shadow-xl flex justify-center items-center gap-3"
+                                              >
+                                                  <i className="fa-solid fa-phone text-[18px]"></i> {selectedCar.category === 'Noleggio' ? 'Chiama per Noleggiare' : 'Chiamaci ora per saperne di più'}
+                                              </a>
+                                              <a 
+                                                href={`https://api.whatsapp.com/send?phone=393939751296&text=${whatsappMessage}`} 
+                                                target="_blank" rel="noreferrer"
+                                                className="w-full bg-[#25D366] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:opacity-90 transition-opacity shadow-xl flex justify-center items-center gap-3"
+                                              >
+                                                  <i className="fa-brands fa-whatsapp text-[20px]"></i> Scrivici su WhatsApp
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div className="mt-16 bg-gray-50 rounded-[3rem] p-8 md:p-12 border border-gray-100">
+                                      <div className="flex items-center gap-4 mb-10">
+                                          <div className="w-12 h-12 bg-[#222d32] rounded-2xl flex items-center justify-center text-[#ebbf40]">
+                                              <i className="fa-solid fa-gear text-[24px]"></i>
+                                          </div>
+                                          <h2 className="text-3xl font-black uppercase text-[#222d32] tracking-tighter">Scheda Tecnica</h2>
+                                      </div>
+
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
+                                          {[
+                                              { label: "Categoria", value: selectedCar.category },
+                                              { label: "Marca", value: selectedCar.brand },
+                                              { label: "Modello", value: selectedCar.model },
+                                              { label: "Anno", value: selectedCar.year },
+                                              { label: "Chilometri", value: selectedCar.mileage },
+                                              { label: "Alimentazione", value: selectedCar.fuel },
+                                              { label: "Cambio", value: selectedCar.transmission },
+                                              { label: "Potenza", value: selectedCar.power },
+                                              { label: "Cilindrata", value: selectedCar.displacement },
+                                              { label: "Colore", value: selectedCar.color }
+                                          ].map((spec, i) => (
+                                              <div key={i} className="flex justify-between items-center py-4 border-b border-gray-200">
+                                                  <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">{spec.label}</span>
+                                                  <span className="text-[#222d32] font-black uppercase text-xs">{spec.value}</span>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </section>
+                  )}
+
+                  {}
+                  {currentPage === 'vendi' && (
+                      <div className="py-24 px-6 max-w-5xl mx-auto animate-in fade-in duration-700">
+                          <h2 className="text-5xl font-black uppercase italic mb-8 text-center">Vendi la tua <span className="text-red-600">Auto</span></h2>
+                          <p className="text-center text-slate-500 font-bold mb-12 text-sm">Compila il modulo sottostante con i dati del tuo veicolo per ricevere una valutazione gratuita e senza impegno.</p>
+                          <div className="bg-white p-4 md:p-8 rounded-[3rem] shadow-xl border border-slate-100 flex justify-center w-full h-[900px]">
+                              <iframe 
+                                  src={CONFIG.linkGoogleFormValutazione} 
+                                  width="100%" 
+                                  height="100%" 
+                                  frameBorder="0" 
+                                  marginHeight="0" 
+                                  marginWidth="0"
+                                  className="rounded-2xl"
+                              >Caricamento in corso…</iframe>
+                          </div>
+                      </div>
+                  )}
+
+                  {}
+                  {currentPage === 'chi-siamo' && (
+                      <section className="bg-white animate-in fade-in duration-700">
+                          <div className="bg-[#1a2226] py-24 px-6 text-center relative overflow-hidden">
+                              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&q=80&w=2000")', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+                              <div className="relative z-10 max-w-4xl mx-auto">
+                                  <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-6">La Nostra Passione</h1>
+                                  <div className="flex items-center justify-center gap-4 mb-8">
+                                      <div className="h-[2px] w-16 bg-[#ebbf40]"></div>
+                                      <i className="fa-solid fa-circle-check text-[24px] text-[#ebbf40]"></i>
+                                      <div className="h-[2px] w-16 bg-[#ebbf40]"></div>
+                                  </div>
+                                  <p className="text-white/80 text-lg font-medium italic">"Non vendiamo solo auto, consegniamo emozioni e affidabilità dal 1985."</p>
+                              </div>
+                          </div>
+
+                          <div className="py-24 container mx-auto px-6 lg:px-20 max-w-[1200px]">
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                                  <div className="relative">
+                                      <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#ebbf40]/10 rounded-full -z-10"></div>
+                                      <img 
+                                          src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=1000" 
+                                          className="rounded-[2.5rem] shadow-2xl border-8 border-white relative z-10"
+                                          alt="Il nostro showroom"
+                                      />
+                                      <div className="absolute -bottom-6 -right-6 bg-[#ebbf40] text-[#222d32] p-8 rounded-3xl shadow-xl hidden md:block z-20">
+                                          <div className="text-4xl font-black">1985</div>
+                                          <div className="text-[10px] font-bold uppercase tracking-widest">L'inizio di tutto</div>
+                                      </div>
+                                  </div>
+                                  <div className="flex flex-col gap-6">
+                                      <span className="text-[#ebbf40] font-black uppercase tracking-[0.2em] text-xs">La Storia di Filippo Salvo</span>
+                                      <h2 className="text-4xl font-black uppercase text-[#222d32] tracking-tighter">Dal "furto" d'auto alla professione di Broker</h2>
+                                      <p className="text-gray-500 leading-relaxed">
+                                          Fissato dalle auto da quando ero bambino, al punto che fin da piccolo "rubavo" l'auto a mio padre per la passione di guidare. La mia carriera nel settore è iniziata quasi per caso nel 1985.
+                                      </p>
+                                      <p className="text-gray-500 leading-relaxed">
+                                          Mio padre stava andando a comprare un'auto e portò con sé un ragazzo. Provammo l'auto insieme e, alla fine, fui io a vendere l'auto a quel ragazzo. Il rivenditore dell'epoca, colpito, mi diede 100.000 lire come ricompensa per avergli piazzato la vettura. Da quel momento ho capito quale fosse la mia strada: diventare un broker per le auto.
+                                      </p>
+                                      <div className="mt-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                                          <i className="fa-solid fa-gauge-high text-[#ebbf40] mb-3 text-[24px]"></i>
+                                          <h4 className="font-bold text-[#222d32] uppercase text-sm mb-2">L'esperienza come Collaudatore</h4>
+                                          <p className="text-sm text-gray-500 leading-relaxed">
+                                              Negli anni '90 ho consolidato la mia esperienza tecnica lavorando come collaudatore per la rivista <strong>Autoggi (in-auto.com)</strong>. Per svariati anni ho risposto ai lettori della testata, pubblicando regolarmente articoli tecnici e mettendo a dura prova le vetture, garantendomi un'esperienza meticolosa che oggi applico su ogni auto che propongo.
                                           </p>
                                       </div>
                                   </div>
                               </div>
                           </div>
-                      </div>
-                  </div>
-              </section>
-          )}
-      </main>
+                      </section>
+                  )}
 
-      {}
-      {/* FOOTER */}
-      <footer className="bg-[#1a2226] text-white pt-20 pb-10 mt-auto">
-        <div className="max-w-[1400px] mx-auto px-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16 border-b border-white/5 pb-16">
-            <div className="col-span-1 md:col-span-1">
-              <div className="flex items-center mb-6 cursor-pointer" onClick={() => navigate('Home')}>
-                  <Car size={32} className="mr-3 text-[#ebbf40]" />
-                  <div className="flex flex-col leading-tight">
-                    <span className="text-2xl font-black tracking-tighter uppercase">Autobroker2000</span>
-                    <span className="text-[10px] tracking-[0.3em] uppercase text-[#ebbf40] font-bold">Di Filippo Salvo</span>
+                  {}
+                  {['Contatti'].includes(currentPage) && (
+                      <section className="bg-white py-24 animate-in fade-in duration-700">
+                          <div className="max-w-[1200px] mx-auto px-6">
+                              <div className="text-center mb-16">
+                                  <span className="text-[#ebbf40] font-black uppercase tracking-[0.2em] text-xs">Siamo a tua disposizione</span>
+                                  <h1 className="text-5xl lg:text-6xl font-black uppercase tracking-tighter text-[#222d32] mt-2 mb-6">Contattaci</h1>
+                                  <div className="flex items-center justify-center gap-4">
+                                      <div className="h-[2px] w-12 bg-gray-200"></div>
+                                      <i className="fa-solid fa-envelope text-gray-300 text-[20px]"></i>
+                                      <div className="h-[2px] w-12 bg-gray-200"></div>
+                                  </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                                  <div className="flex flex-col gap-8">
+                                      <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
+                                          <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
+                                              <i className="fa-solid fa-location-dot text-[28px]"></i>
+                                          </div>
+                                          <div>
+                                              <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">La Nostra Sede</h3>
+                                              <p className="text-gray-500 leading-relaxed font-medium">VIA ALFREDO CASELLA 13<br/>00199 ROMA RM</p>
+                                          </div>
+                                      </div>
+
+                                      <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
+                                          <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
+                                              <i className="fa-solid fa-phone text-[28px]"></i>
+                                          </div>
+                                          <div>
+                                              <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">Recapito Telefonico</h3>
+                                              <p className="text-gray-500 leading-relaxed font-medium mb-3">Chiamaci per qualsiasi informazione, valutazione o per prenotare un appuntamento.</p>
+                                              <a href="tel:+393939751296" className="inline-flex text-[#222d32] font-black text-lg hover:text-[#ebbf40] transition-colors">
+                                                  +39 393 975 1296
+                                              </a>
+                                          </div>
+                                      </div>
+
+                                      <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex items-start gap-6 hover:shadow-lg transition-shadow">
+                                          <div className="w-14 h-14 bg-[#222d32] text-[#ebbf40] rounded-2xl flex items-center justify-center shrink-0">
+                                              <i className="fa-solid fa-envelope text-[28px]"></i>
+                                          </div>
+                                          <div>
+                                              <h3 className="text-xl font-black uppercase text-[#222d32] tracking-tighter mb-2">Posta Elettronica</h3>
+                                              <p className="text-gray-500 leading-relaxed font-medium mb-3">Preferisci scriverci? Inviaci un'email e ti risponderemo il prima possibile.</p>
+                                              <a href="mailto:Filipposalvo@hotmail.it" className="inline-flex text-[#222d32] font-black text-lg hover:text-[#ebbf40] transition-colors break-all">
+                                                  Filipposalvo@hotmail.it
+                                              </a>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div className="flex flex-col gap-8 h-full">
+                                      <div className="bg-[#1a2226] text-white rounded-3xl p-10 shadow-xl h-full flex flex-col justify-center relative overflow-hidden">
+                                          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#ebbf40]/10 rounded-full blur-2xl"></div>
+                                          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#ebbf40]/10 rounded-full blur-2xl"></div>
+                                          
+                                          <div className="relative z-10">
+                                              <h3 className="text-3xl font-black uppercase text-[#ebbf40] tracking-tighter mb-8 flex items-center gap-3">
+                                                  <i className="fa-regular fa-clock text-[28px]"></i> Orari di Apertura
+                                              </h3>
+                                              
+                                              <div className="flex flex-col gap-4">
+                                                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                                                      <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Lunedì - Venerdì</span>
+                                                      <span className="text-white font-black">09:00 - 13:00 / 15:00 - 19:30</span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                                                      <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Sabato</span>
+                                                      <span className="text-white font-black">09:00 - 13:00</span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center pb-4">
+                                                      <span className="text-gray-300 font-bold uppercase text-xs tracking-widest">Domenica</span>
+                                                      <span className="text-red-400 font-black">Chiuso</span>
+                                                  </div>
+                                              </div>
+
+                                              <div className="mt-10 p-6 bg-white/5 rounded-2xl border border-white/10">
+                                                  <p className="text-gray-300 text-sm leading-relaxed italic">
+                                                      "Si consiglia di fissare sempre un appuntamento telefonico prima di recarsi in sede per garantire la nostra totale disponibilità."
+                                                  </p>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </section>
+                  )}
+              </main>
+
+              {}
+              <footer className="bg-[#1a2226] text-white pt-20 pb-10 mt-auto">
+                <div className="max-w-[1400px] mx-auto px-10">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16 border-b border-white/5 pb-16">
+                    <div className="col-span-1 md:col-span-1">
+                      <div className="flex items-center mb-6 cursor-pointer" onClick={() => navigate('Home')}>
+                          <i className="fa-solid fa-car text-[32px] mr-3 text-[#ebbf40]"></i>
+                          <div className="flex flex-col leading-tight">
+                            <span className="text-2xl font-black tracking-tighter uppercase">Autobroker2000</span>
+                            <span className="text-[10px] tracking-[0.3em] uppercase text-[#ebbf40] font-bold">Di Filippo Salvo</span>
+                          </div>
+                      </div>
+                      <p className="text-gray-400 text-sm leading-relaxed mb-2">Punto di riferimento per auto usate garantite e servizi di noleggio.</p>
+                      <p className="text-gray-500 text-xs font-bold">P.IVA: 09996860582</p>
+                    </div>
+                    <div>
+                      <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Link Rapidi</h4>
+                      <ul className="flex flex-col gap-4 text-gray-400 text-xs font-medium">
+                        {menuItems.map(item => (
+                            <li key={item.label} onClick={() => navigate(item.id)} className="hover:text-white cursor-pointer uppercase tracking-widest transition-colors">{item.label}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                        <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Social</h4>
+                        <div className="flex gap-4">
+                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-facebook-f text-[18px]"></i></div>
+                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-instagram text-[18px]"></i></div>
+                            <div className="p-3 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><i className="fa-brands fa-linkedin-in text-[18px]"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                      <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Contatti</h4>
+                      <p className="text-gray-400 text-xs uppercase tracking-widest leading-loose">VIA ALFREDO CASELLA 13<br/>00199 ROMA RM</p>
+                      <p className="text-gray-400 text-xs uppercase tracking-widest mt-4">+39 393 975 1296</p>
+                      <p className="text-gray-400 text-[10px] uppercase tracking-widest mt-2 break-all">Filipposalvo@hotmail.it</p>
+                    </div>
                   </div>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-2">Punto di riferimento per auto usate garantite e servizi di noleggio.</p>
-              <p className="text-gray-500 text-xs font-bold">P.IVA: 09996860582</p>
-            </div>
-            <div>
-              <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Link Rapidi</h4>
-              <ul className="flex flex-col gap-4 text-gray-400 text-xs font-medium">
-                {menuItems.map(item => (
-                    <li key={item.label} onClick={() => navigate(item.id)} className="hover:text-white cursor-pointer uppercase tracking-widest transition-colors">{item.label}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-                <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Social</h4>
-                <div className="flex gap-4">
-                    <div className="p-2 bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><Facebook size={18} /></div>
-                    <div className="p-2 bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><Instagram size={18} /></div>
-                    <div className="p-2 bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><Twitter size={18} /></div>
-                    <div className="p-2 bg-white/5 rounded-full hover:bg-[#ebbf40] hover:text-black transition-colors cursor-pointer"><Linkedin size={18} /></div>
+                  <div className="text-center text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">© 2024 Autobroker2000 Di Filippo Salvo. Tutti i diritti riservati.</div>
                 </div>
+              </footer>
             </div>
-            <div>
-              <h4 className="text-[#ebbf40] font-black uppercase text-sm tracking-widest mb-8">Contatti</h4>
-              <p className="text-gray-400 text-xs uppercase tracking-widest leading-loose">Via Alfredo Casella 13<br/>00199 Roma (RM)</p>
-              <p className="text-gray-400 text-xs uppercase tracking-widest mt-4">+39 393 975 1296</p>
-              <p className="text-gray-400 text-[10px] uppercase tracking-widest mt-2 break-all">Filipposalvo@hotmail.it</p>
-            </div>
-          </div>
-          <div className="text-center text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">© 2024 Autobroker2000 Di Filippo Salvo. Tutti i diritti riservati.</div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
