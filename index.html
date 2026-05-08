@@ -277,7 +277,7 @@
                                         <div className="w-1.5 h-6 bg-[#ebbf40] rounded-full"></div>
                                         <h3 className="text-xl font-black text-[#222d32] uppercase tracking-tighter">{car.brand} {car.model}</h3>
                                       </div>
-                                      <p className="text-gray-400 text-sm leading-relaxed mb-8 h-12 overflow-hidden">{car.description || 'Nessuna descrizione fornita.'}</p>
+                                      <p className="text-gray-400 text-sm leading-relaxed mb-8 h-12 overflow-hidden whitespace-pre-line line-clamp-2">{car.description || 'Nessuna descrizione fornita.'}</p>
                                       
                                       <div className="grid grid-cols-3 bg-gray-50 rounded-xl divide-x divide-gray-200">
                                         <div className="py-4 px-1 text-center">
@@ -416,7 +416,7 @@
                                       <div className="flex flex-col justify-center">
                                           <span className="text-[#ebbf40] font-black uppercase tracking-[0.3em] text-xs mb-2">{selectedCar.brand}</span>
                                           <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-[#222d32] mb-6 leading-tight">{selectedCar.model}</h1>
-                                          <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic">"{selectedCar.description || 'Nessuna descrizione fornita.'}"</p>
+                                          <p className="text-gray-500 leading-relaxed mb-8 text-lg font-light italic whitespace-pre-line">"{selectedCar.description || 'Nessuna descrizione fornita.'}"</p>
                                           
                                           <div className="text-4xl lg:text-5xl font-black text-[#222d32] tracking-tighter mb-10 pb-8 border-b border-gray-100">
                                               {selectedCar.price}
