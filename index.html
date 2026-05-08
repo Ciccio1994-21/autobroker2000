@@ -245,6 +245,73 @@
                               </div>
                             </div>
                           </section>
+
+                          {/* SEZIONE AUTO IN EVIDENZA (Ripristinata) */}
+                          <section className="py-24 bg-white border-t border-gray-50">
+                            <div className="max-w-[1200px] mx-auto px-6">
+                              <div className="text-center mb-16">
+                                <h2 className="text-4xl font-black text-[#222d32] uppercase tracking-tighter mb-4">AUTO IN EVIDENZA</h2>
+                                <div className="flex items-center justify-center gap-4 mb-6">
+                                  <div className="h-[2px] w-12 bg-gray-200"></div>
+                                  <i className="fa-solid fa-car text-[20px] text-[#ebbf40]"></i>
+                                  <div className="h-[2px] w-12 bg-gray-200"></div>
+                                </div>
+                                <p className="text-gray-500 text-sm max-w-2xl mx-auto">I migliori modelli selezionati per qualità, prestazioni e affidabilità.</p>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {/* Mostra solo le prime 3 auto */}
+                                {carsData.slice(0, 3).map((car) => (
+                                  <div key={car.id} onClick={() => navigate('Dettaglio', car)} className="bg-white rounded-2xl overflow-hidden shadow-lg group cursor-pointer transition-all duration-500 hover:-translate-y-2 border border-gray-100 relative">
+                                    <div className="absolute top-4 left-4 z-10">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md ${car.category === 'Usato' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                                            {car.category || 'Veicolo'}
+                                        </span>
+                                    </div>
+                                    <div className="relative h-60 overflow-hidden">
+                                      <img src={car.images && car.images[0] ? car.images[0] : "https://placehold.co/600x400/eeeeee/999999?text=Nessuna+Foto"} alt={car.model} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                      <div className="absolute top-4 right-4 bg-black/70 backdrop-blur text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">{car.price || 'Trattativa Riservata'}</div>
+                                    </div>
+                                    <div className="p-8">
+                                      <div className="flex items-center gap-2 mb-4">
+                                        <div className="w-1.5 h-6 bg-[#ebbf40] rounded-full"></div>
+                                        <h3 className="text-xl font-black text-[#222d32] uppercase tracking-tighter">{car.brand} {car.model}</h3>
+                                      </div>
+                                      <p className="text-gray-400 text-sm leading-relaxed mb-8 h-12 overflow-hidden">{car.description || 'Nessuna descrizione fornita.'}</p>
+                                      
+                                      <div className="grid grid-cols-3 bg-gray-50 rounded-xl divide-x divide-gray-200">
+                                        <div className="py-4 px-1 text-center">
+                                          <p className="text-[9px] text-gray-400 font-bold uppercase mb-1">Anno</p>
+                                          <p className="text-[11px] font-black text-[#222d32] truncate">{car.year || '-'}</p>
+                                        </div>
+                                        <div className="py-4 px-1 text-center">
+                                          <p className="text-[9px] text-gray-400 font-bold uppercase mb-1">Cambio</p>
+                                          <p className="text-[11px] font-black text-[#222d32] truncate uppercase">{car.transmission || '-'}</p>
+                                        </div>
+                                        <div className="py-4 px-1 text-center">
+                                          <p className="text-[9px] text-gray-400 font-bold uppercase mb-1">Km</p>
+                                          <p className="text-[11px] font-black text-[#222d32] truncate">{car.mileage || '-'}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                                {carsData.length === 0 && (
+                                    <div className="col-span-full text-center py-10">
+                                        <span className="text-gray-400 font-bold uppercase tracking-widest">Nessun veicolo in evidenza al momento.</span>
+                                    </div>
+                                )}
+                              </div>
+                              
+                              {carsData.length > 0 && (
+                                <div className="text-center mt-12">
+                                  <button onClick={() => navigate('Inventario')} className="border-2 border-[#222d32] text-[#222d32] px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#222d32] hover:text-white transition-all shadow-sm">
+                                    Vedi tutte le auto
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </section>
                       </>
                   )}
 
